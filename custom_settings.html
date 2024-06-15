@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Settings</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { color: #4CAF50; }
+        label { display: block; margin-top: 10px; }
+        input[type="text"], input[type="number"] { width: 100%; padding: 5px; margin-top: 5px; }
+        button { margin-top: 20px; padding: 10px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        pre { background-color: #f4f4f4; padding: 10px; border-radius: 5px; }
+    </style>
+    <script>
+        // Function to load rows data into the page
+        function loadRowsData() {
+            var uniqueId = localStorage.getItem('custom_settings_id');
+            var savedRows = JSON.parse(localStorage.getItem("rows_" + uniqueId)) || [];
+            document.getElementById('rowsData').textContent = JSON.stringify(savedRows, null, 2);
+        }
+
+        // Function to load image URL into the input field
+        function loadImageUrl() {
+            var uniqueId = localStorage.getItem('custom_settings_id');
+            var savedImageUrl = localStorage.getItem("image_url_" + uniqueId) || "";
+            document.getElementById('image_url').value = savedImageUrl;
+        }
+
+        // Trigger loading of rows data and image URL on page load
+        window.onload = function() {
+            loadRowsData();
+            loadImageUrl();
+        };
+
+                // Listen for messages from any origin
+        window.addEventListener('message', function(event) {
+            // Check origin to ensure it's from the correct source
+            if (event.origin === 'https://apexlegendsstatus.com') {
+                // Handle received data
+                var rows = event.data;
+                
+                // Now you can use `rows` variable to access the data in your webpage
+            }
+        });
+
+
+    </script>
+</head>
+<body>
+    <h1>Custom Settings Page</h1>
+
+    <div id="rowsDataContainer">
+        <h2>Rows Data:</h2>
+        <pre id="rowsData"></pre>
+    </div>
+
+    <label for="image_url">Image URL:</label>
+    <input type="text" id="image_url" name="image_url" value="">
+
+</body>
+</html>
