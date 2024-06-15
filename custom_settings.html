@@ -32,6 +32,18 @@
             loadRowsData();
             loadImageUrl();
         };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var rowsData = localStorage.getItem('rowsData');
+            var rows = JSON.parse(rowsData);
+
+            // Use rows data as needed
+            var preElement = document.getElementById('rowsData');
+            if (preElement) {
+                preElement.textContent = JSON.stringify(rows, null, 2);
+            }
+        });
+
     </script>
 </head>
 <body>
