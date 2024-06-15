@@ -13,36 +13,15 @@
         pre { background-color: #f4f4f4; padding: 10px; border-radius: 5px; }
     </style>
     <script>
-        // Function to load rows data into the page
-        function loadRowsData() {
-            var uniqueId = localStorage.getItem('custom_settings_id');
-            var savedRows = JSON.parse(localStorage.getItem("rows_" + uniqueId)) || [];
-            document.getElementById('rowsData').textContent = JSON.stringify(savedRows, null, 2);
-        }
-
-        // Function to load image URL into the input field
-        function loadImageUrl() {
-            var uniqueId = localStorage.getItem('custom_settings_id');
-            var savedImageUrl = localStorage.getItem("image_url_" + uniqueId) || "";
-            document.getElementById('image_url').value = savedImageUrl;
-        }
-
-        // Trigger loading of rows data and image URL on page load
-        window.onload = function() {
-            loadRowsData();
-            loadImageUrl();
-        };
-
-        document.addEventListener('DOMContentLoaded', function() {
-            var rowsData = localStorage.getItem('rowsData');
-            var rows = JSON.parse(rowsData);
-
-            // Use rows data as needed
-            var preElement = document.getElementById('rowsData');
-            if (preElement) {
-                preElement.textContent = JSON.stringify(rows, null, 2);
+        window.addEventListener('message', function(event) {
+            // Check origin to ensure it's from the correct source
+            if (event.origin === 'https://apexlegendsstatus.com') {
+                // Handle received data
+                var rows = event.data;
+                console.log(rows);
             }
         });
+
 
     </script>
 </head>
