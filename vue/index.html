@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Generator</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <script async src="https://docs.opencv.org/4.x/opencv.js" onload="cv['onRuntimeInitialized']=()=>{};"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <div id="image-preview">
+            <div>
+                <label>圖片（偵測位置）: <input type="text" v-model="imageUrl1" @input="updateImage(1)"></label>
+                <div class="image-container" v-if="imageStatus1 === 'loaded'">
+                    <img :src="imageUrl1" alt="Image 1" width="100%">
+                </div>
+                <div class="image-container" v-else>{{ imageStatus1 }}</div>
+            </div>
+            <div>
+                <label>圖片（用於合成）: <input type="text" v-model="imageUrl2" @input="updateImage(2)"></label>
+                <div class="image-container" v-if="imageStatus2 === 'loaded'">
+                    <img :src="imageUrl2" alt="Image 2" width="100%">
+                </div>
+                <div class="image-container" v-else>{{ imageStatus2 }}</div>
+            </div>
+        </div>
+        <div>
+            <label>Match Scores JSON: <textarea id="rowsData" v-model="matchScoresJson"></textarea></label>
+        </div>
+        <div id="components">
+            <div v-for="(component, index) in components" :key="index">
+                <label>{{ component.name }} Color:</label>
+                <input type="color" v-model="component.color" />
+                <span>Font Size:</span>
+                <input type="number" v-model="component.fontSize" />
+                <span>Offset X:</span>
+                <input type="number" v-model="component.offsetX" />
+                <span>Offset Y:</span>
+                <input type="number" v-model="component.offsetY" />
+            </div>
+        </div>
+        
+        <label>
+            <input type="checkbox" v-model="drawContours"> 繪製輪廓
+        </label>
+        <div>
+            <button @click="generateImage">生成</button>
+            <button @click="copyImage">複製圖片</button>
+        </div>
+        <div class="image-container">
+            <img :src="finalImage" alt="Final Image" width="100%" v-if="finalImage">
+        </div>
+        <div id="font-selector">
+            <input type="text" id="font-search" placeholder="Search fonts...">
+            <select id="font-list" size="10"></select>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script src="imageProcessor.js"></script>
+    <script src="fontSelector.js"></script>
+    <script src="localStorageHandler.js"></script>
+</body>
+</html>
