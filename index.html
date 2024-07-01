@@ -31,14 +31,15 @@
         </div>
         <div id="components">
             <div v-for="(component, index) in components" :key="index">
-                <label>{{ component.name }} Color:</label>
+                <label>{{ component.name }}</label>
+                <span>矩形色塊:</span>
                 <input type="color" v-model="component.color" />
-                <span>Font Size:</span>
-                <input type="number" v-model="component.fontSize" />
+                <span>字體大小:</span>
+                <input type="number" value="20" v-model="component.fontSize" />
                 <span>Offset X:</span>
-                <input type="number" v-model="component.offsetX" />
+                <input type="number" value="0" v-model="component.offsetX" />
                 <span>Offset Y:</span>
-                <input type="number" v-model="component.offsetY" />
+                <input type="number" value="0" v-model="component.offsetY" />
             </div>
         </div>
         
@@ -47,14 +48,15 @@
         </label>
         <div>
             <button @click="generateImage">生成</button>
-            <button @click="copyImage">複製圖片</button>
+            <button @click="copyImage">{{ buttonText }}</button>
         </div>
         <div class="image-container">
             <img :src="finalImage" alt="Final Image" width="100%" v-if="finalImage">
         </div>
-        <div id="font-selector">
+        <div id="font-selector-container">
             <input type="text" id="font-search" placeholder="Search fonts...">
             <select id="font-list" size="10"></select>
+            <button id="request-font-access" style="display: none;">點擊此處同意讀取本地字體列表</button>
         </div>
     </div>
 

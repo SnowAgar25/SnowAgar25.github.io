@@ -24,34 +24,34 @@ var vm = new Vue({
         components: [
             {
                 name: 'Rank',
-                color: '#FF0000',
+                color: '#000000',
                 fontSize: 20,
                 offsetX: 0,
                 offsetY: 0,
             },
             {
                 name: 'Team',
-                color: '#00FF00',
+                color: '#000000',
                 fontSize: 20,
                 offsetX: 0,
                 offsetY: 0,
             },
             {
                 name: 'Score',
-                color: '#0000FF',
+                color: '#000000',
                 fontSize: 20,
                 offsetX: 0,
                 offsetY: 0,
             },
             {
                 name: 'Kills',
-                color: '#FFFF00',
+                color: '#000000',
                 fontSize: 20,
                 offsetX: 0,
                 offsetY: 0,
             },
-        ]
-        
+        ],
+        buttonText: '複製圖片'
     },    
     methods: {
         updateImage(imageNumber) {
@@ -95,7 +95,10 @@ var vm = new Vue({
         },
         copyImage() {
             if (!this.finalImage) {
-                alert('沒有圖片可以複製');
+                this.buttonText = '無圖可複製';
+                setTimeout(() => {
+                    this.buttonText = '複製圖片';
+                }, 800);
                 return;
             }
 
@@ -104,8 +107,15 @@ var vm = new Vue({
                 .then(blob => {
                     const item = new ClipboardItem({ 'image/png': blob });
                     navigator.clipboard.write([item])
-                        .then(() => alert('圖片已複製'))
-                        .catch(err => alert('複製圖片失敗：' + err.message));
+                        .then(() => {
+                            this.buttonText = '圖片已複製';
+                            setTimeout(() => {
+                                this.buttonText = '複製圖片';
+                            }, 800);
+                        })
+                        .catch(err => {
+                            alert('複製圖片失敗：' + err.message);
+                        });
                 });
         }
     }

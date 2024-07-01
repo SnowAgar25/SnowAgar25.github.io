@@ -1,71 +1,96 @@
-// fontSelector.js
-
-document.addEventListener('DOMContentLoaded', () => {
-    loadLocalStorageData();
-
+document.addEventListener('DOMContentLoaded', async () => {
     const fontList = document.getElementById('font-list');
     const searchInput = document.getElementById('font-search');
+    const requestButton = document.getElementById('request-font-access');
 
-    // 檢查用戶是否已經同意獲取字體
-    const hasPermission = localStorage.getItem('fontPermission') === 'granted';
+    // 查詢字體權限狀態
+    checkFontPermission();
 
-    // 如果用戶尚未同意，詢問獲取字體的權限
-    if (!hasPermission) {
-        Notification.requestPermission().then(permission => {
-            if (permission === 'granted') {
-                localStorage.setItem('fontPermission', 'granted');
-                loadFonts();
-            }
-        });
-    } else {
-        // 用戶已經同意獲取字體，直接加載字體列表
-        loadFonts();
-    }
+    // 檢查本地存儲中是否有選擇的字體並設置
+    loadLocalStorageData();
 
-    function loadFonts() {
-        // 加載字體列表
-        queryLocalFonts().then(fonts => {
-            fonts.forEach(font => {
-                const option = document.createElement('option');
-                option.value = font.postscriptName; // 使用 postscriptName 作為值
-                option.textContent = font.fullName; // 使用 fullName 作為顯示文本
-                fontList.appendChild(option);
-            });
-
-            // 設置選中的字體
-            const selectedFont = localStorage.getItem('selectedFont');
-            if (selectedFont) {
-                selectFont(selectedFont);
-            }
-        });
-    }
+    // 添加按鈕點擊事件
+    requestButton.addEventListener('click', async () => {
+        try {
+            await queryLocalFonts();
+            localStorage.setItem('fontAccessGranted', 'true');
+            requestButton.style.display = 'none';
+            loadFonts();
+        } catch (err) {
+            console.error('Error querying fonts:', err);
+        }
+    });
 
     // 監聽字體選擇事件
     fontList.addEventListener('change', (event) => {
         const selectedFont = event.target.value;
         localStorage.setItem('selectedFont', selectedFont);
+        // 更新 Vue 實例中的 selectedFont
+        const app = document.getElementById('app');
+        if (app && app.__vue__) {
+            app.__vue__.selectedFont = selectedFont;
+        }
     });
 
-    // 監聽搜索欄輸入事件
+    // 監聽搜尋欄輸入事件
     searchInput.addEventListener('input', () => {
         const searchQuery = searchInput.value.toLowerCase();
         const options = fontList.options;
 
         for (let i = 0; i < options.length; i++) {
             const fontName = options[i].textContent.toLowerCase();
-            if (fontName.includes(searchQuery)) {
-                options[i].style.display = 'block';
-            } else {
-                options[i].style.display = 'none';
-            }
+            options[i].style.display = fontName.includes(searchQuery) ? 'block' : 'none';
         }
     });
 });
 
+async function checkFontPermission() {
+    try {
+        const permissionStatus = await navigator.permissions.query({ name: 'local-fonts' });
+        updateButtonVisibility(permissionStatus.state);
+        permissionStatus.onchange = () => {
+            updateButtonVisibility(permissionStatus.state);
+        };
+    } catch (error) {
+        console.error('Error querying permission:', error);
+    }
+}
+
+function updateButtonVisibility(state) {
+    const requestButton = document.getElementById('request-font-access');
+    if (state === 'granted') {
+        requestButton.style.display = 'none';
+        loadFonts();
+    } else if (state === 'prompt') {
+        requestButton.style.display = 'block';
+        requestButton.textContent = '點擊此處同意讀取本地字體列表';
+        requestButton.disabled = false;
+    } else if (state === 'denied') {
+        requestButton.style.display = 'block';
+        requestButton.textContent = '您封鎖了字形的權限，請至網站權限重新設定';
+        requestButton.disabled = true; // 按鈕無法按下
+    }
+}
+
+async function loadFonts() {
+    const fontList = document.getElementById('font-list');
+    const fonts = await queryLocalFonts();
+    fonts.forEach(font => {
+        const option = document.createElement('option');
+        option.value = font.postscriptName;
+        option.textContent = font.fullName;
+        fontList.appendChild(option);
+    });
+
+    const selectedFont = localStorage.getItem('selectedFont');
+    if (selectedFont) {
+        selectFont(selectedFont);
+    }
+}
+
 function loadLocalStorageData() {
     const selectedFont = localStorage.getItem('selectedFont');
     if (selectedFont) {
-        // 選擇存儲的字體
         selectFont(selectedFont);
     }
 }

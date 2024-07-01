@@ -69,11 +69,11 @@ button {
     background-color: #007bff;
     color: #fff;
     border: none;
-    cursor: pointer;
     margin-top: 10px;
 }
 
 button:hover {
+    cursor: pointer;
     background-color: #0056b3;
 }
 
