@@ -30,7 +30,10 @@
             <label>Match Scores JSON: <textarea id="rowsData" v-model="matchScoresJson"></textarea></label>
         </div>
         <div id="components">
-            <div v-for="(component, index) in components" :key="index">
+            <div v-for="(component, index) in components" :key="index" class="component-selector">
+                <component-selector :component="component"></component-selector>
+            </div>
+            <!-- <div v-for="(component, index) in components" :key="index">
                 <label>{{ component.name }}</label>
                 <span>矩形色塊:</span>
                 <input type="color" v-model="component.color" />
@@ -40,7 +43,7 @@
                 <input type="number" value="0" v-model="component.offsetX" />
                 <span>Offset Y:</span>
                 <input type="number" value="0" v-model="component.offsetY" />
-            </div>
+            </div> -->
         </div>
         
         <label>

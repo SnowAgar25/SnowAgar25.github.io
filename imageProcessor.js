@@ -37,7 +37,16 @@ async function processImages(imageUrl1, imageUrl2, components, matchScores, sele
                     const rect = getBoundingRect(contour);
                     const text = values[index];
                     if (text) {
-                        drawText(ctx, text, rect, selectedFont, component.fontSize, component.offsetX, component.offsetY);
+                        drawText(
+                            ctx, 
+                            text, 
+                            rect, 
+                            selectedFont, 
+                            component.fontSize, 
+                            component.offsetX, 
+                            component.offsetY,
+                            component.align
+                        );
                     }
 
                     // 繪製輪廓框
@@ -53,16 +62,25 @@ async function processImages(imageUrl1, imageUrl2, components, matchScores, sele
     return finalImageUrl;
 }
 
-function drawText(ctx, text, rect, font, fontSize, offsetX, offsetY) {
+function drawText(ctx, text, rect, font, fontSize, offsetX, offsetY, align) {
     ctx.font = `${fontSize || 20}px ${font || 'Arial'}`;
     ctx.fillStyle = 'white';
-    ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(
-        text, 
-        rect.x + rect.width / 2 + Number(offsetX), 
-        rect.y + rect.height / 2 + Number(offsetY)
-    );
+    if (align === 'center') {
+        ctx.textAlign = 'center';
+        ctx.fillText(
+            text, 
+            rect.x + rect.width / 2 + Number(offsetX), 
+            rect.y + rect.height / 2 + Number(offsetY)
+        );
+    } else {
+        ctx.textAlign = 'left';
+        ctx.fillText(
+            text, 
+            rect.x + Number(offsetX), 
+            rect.y + rect.height / 2 + Number(offsetY)
+        );
+    }
 }
 
 function drawContour(ctx, contour) {

@@ -3,11 +3,27 @@ Vue.component('component-selector', {
     props: ['component'],
     template: `
         <div>
-            <label>{{ component.name }}: 
-                <input type="color" v-model="component.color" class="color-picker">
-            </label>
+            <label>{{ component.name }}: </label>
+            <span>矩形色塊:</span>
+            <input type="color" v-model="component.color" class="color-picker">
+        
+            <span>字體大小:</span>
+            <input type="number" v-model="component.fontSize" min="1" style="width: 60px;">
+            
+            <span>偏移X:</span>
+            <input type="number" v-model="component.offsetX" style="width: 60px;">
+            
+            <span>偏移Y:</span>
+            <input type="number" v-model="component.offsetY" style="width: 60px;">
+            
+            <button @click="toggleAlign">{{ component.align === 'center' ? '置左' : '置中' }}</button>
         </div>
-    `
+    `,
+    methods: {
+        toggleAlign() {
+            this.component.align = this.component.align === 'center' ? 'left' : 'center';
+        }
+    }
 });
 
 var vm = new Vue({
@@ -28,6 +44,7 @@ var vm = new Vue({
                 fontSize: 20,
                 offsetX: 0,
                 offsetY: 0,
+                align: 'center'
             },
             {
                 name: 'Team',
@@ -35,6 +52,7 @@ var vm = new Vue({
                 fontSize: 20,
                 offsetX: 0,
                 offsetY: 0,
+                align: 'center'
             },
             {
                 name: 'Score',
@@ -42,6 +60,7 @@ var vm = new Vue({
                 fontSize: 20,
                 offsetX: 0,
                 offsetY: 0,
+                align: 'center'
             },
             {
                 name: 'Kills',
@@ -49,6 +68,7 @@ var vm = new Vue({
                 fontSize: 20,
                 offsetX: 0,
                 offsetY: 0,
+                align: 'center'
             },
         ],
         buttonText: '複製圖片'
