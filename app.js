@@ -200,11 +200,20 @@ async function saveFileToOpfs(file) {
     try {
         const storageRoot = await navigator.storage.getDirectory();
         const uploadsDir = await storageRoot.getDirectoryHandle('uploads', { create: true });
+
+        // 刪除舊檔案
+        const previousFileName = localStorage.getItem('uploadedFontFileName');
+        if (previousFileName) {
+            await uploadsDir.removeEntry(previousFileName, { recursive: false });
+        }
+
         const newFile = await uploadsDir.getFileHandle(file.name, { create: true });
-        console.log(newFile);
         const writable = await newFile.createWritable();
         await writable.write(file);
         await writable.close();
+
+        // 儲存最新上傳的檔案名稱
+        localStorage.setItem('uploadedFontFileName', file.name);
     } catch (err) {
         console.error('Error saving file to OPFS:', err);
     }
@@ -214,19 +223,19 @@ async function loadFontFromOpfs() {
     try {
         const storageRoot = await navigator.storage.getDirectory();
         const uploadsDir = await storageRoot.getDirectoryHandle('uploads');
-        for await (const entry of uploadsDir.values()) {
-            if (entry.kind === 'file') {
-                const file = await entry.getFile();
-                console.log(file);
-                const fileInput = document.getElementById('font-upload-input');
-                const dataTransfer = new DataTransfer();
-                dataTransfer.items.add(new File([file], file.name));
-                fileInput.files = dataTransfer.files;
-                await loadFont(file);
-                break;
-            }
+        const fileName = localStorage.getItem('uploadedFontFileName');
+        
+        if (fileName) {
+            const fileHandle = await uploadsDir.getFileHandle(fileName);
+            const file = await fileHandle.getFile();
+            const fileInput = document.getElementById('font-upload-input');
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(new File([file], file.name));
+            fileInput.files = dataTransfer.files;
+            await loadFont(file);
         }
     } catch (err) {
         console.error('Error loading file from OPFS:', err);
     }
 }
+
