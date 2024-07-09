@@ -119,3 +119,29 @@ button:hover {
     padding: 5px;
     box-sizing: border-box;
 }
+
+
+.font-upload {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.font-upload label {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+#font-upload-input {
+    padding: 8px 12px;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: border-color 0.3s;
+}
+
+#font-upload-input:hover {
+    border-color: #888;
+}

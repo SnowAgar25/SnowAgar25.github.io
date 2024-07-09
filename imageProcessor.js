@@ -1,22 +1,20 @@
-async function processImages(imageUrl1, imageUrl2, components, matchScores, selectedFont, drawContours) {
-    // 載入圖片
+async function processImages(imageUrl1, imageUrl2, components, matchScores, uploadedFont, drawContours) {
+    // Load images
     const [image1, image2] = await Promise.all([loadImage(imageUrl1), loadImage(imageUrl2)]);
 
-    // 創建畫布
+    // Create canvas
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     canvas.width = image2.width;
     canvas.height = image2.height;
     ctx.drawImage(image2, 0, 0);
 
-    // 繪製每個component的數據到對應的輪廓
+    // Draw text on contours
     components.forEach((component, componentIndex) => {
         if (component.color !== '#000000') {
-            // 獲取component對應的數據列表
             const valueIndex = componentIndex;
             const values = matchScores.slice(1).map(score => score[valueIndex]);
 
-            // 檢測component顏色的輪廓
             const tempCanvas = document.createElement('canvas');
             const tempCtx = tempCanvas.getContext('2d');
             tempCanvas.width = image1.width;
@@ -28,10 +26,8 @@ async function processImages(imageUrl1, imageUrl2, components, matchScores, sele
             const contours = findContours(mask, image1.width, image1.height);
             const filteredContours = contours.filter(contour => contour.area > 10);
 
-            // 調整排序方式：從上到下，再從左到右
             filteredContours.sort((a, b) => a.points[0].x - b.points[0].x || a.points[0].y - b.points[0].y);
 
-            // 將數據生成到對應的輪廓中
             filteredContours.forEach((contour, index) => {
                 if (index < values.length) {
                     const rect = getBoundingRect(contour);
@@ -41,7 +37,7 @@ async function processImages(imageUrl1, imageUrl2, components, matchScores, sele
                             ctx, 
                             text, 
                             rect, 
-                            selectedFont, 
+                            uploadedFont ? 'uploadedFont' : 'Arial', 
                             component.fontSize, 
                             component.offsetX, 
                             component.offsetY,
@@ -49,7 +45,6 @@ async function processImages(imageUrl1, imageUrl2, components, matchScores, sele
                         );
                     }
 
-                    // 繪製輪廓框
                     if (drawContours) {
                         drawContour(ctx, contour);
                     }
@@ -63,7 +58,7 @@ async function processImages(imageUrl1, imageUrl2, components, matchScores, sele
 }
 
 function drawText(ctx, text, rect, font, fontSize, offsetX, offsetY, align) {
-    ctx.font = `${fontSize || 20}px ${font || 'Arial'}`;
+    ctx.font = `${fontSize || 20}px ${font}`;
     ctx.fillStyle = 'white';
     ctx.textBaseline = 'middle';
     if (align === 'center') {

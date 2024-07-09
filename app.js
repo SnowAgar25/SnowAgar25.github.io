@@ -140,3 +140,93 @@ var vm = new Vue({
         }
     }
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Load data from localStorage
+    loadLocalStorageData();
+
+    // Add event listener for font upload
+    const fontUploadInput = document.getElementById('font-upload-input');
+    fontUploadInput.addEventListener('change', async (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            await loadFont(file);
+            await saveFileToOpfs(file);
+        }
+    });
+
+    // Check if there is an uploaded font file in OPFS
+    loadFontFromOpfs();
+
+    // Watch Vue instance for changes
+    const app = document.getElementById('app');
+    if (app && app.__vue__) {
+        const vueInstance = app.__vue__;
+        vueInstance.$watch('imageUrl1', function (newValue) {
+            localStorage.setItem('imageUrl1', newValue);
+            vueInstance.updateImage(1);
+        });
+        vueInstance.$watch('imageUrl2', function (newValue) {
+            localStorage.setItem('imageUrl2', newValue);
+            vueInstance.updateImage(2);
+        });
+        vueInstance.$watch('matchScoresJson', function (newValue) {
+            localStorage.setItem('matchScoresJson', newValue);
+        });
+        vueInstance.$watch('components', function (newValue) {
+            localStorage.setItem('components', JSON.stringify(newValue));
+        }, { deep: true });
+    }
+});
+
+async function loadFont(file) {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        const font = new FontFace('uploadedFont', e.target.result);
+        font.load().then(function (loadedFont) {
+            document.fonts.add(loadedFont);
+            const app = document.getElementById('app');
+            if (app && app.__vue__) {
+                app.__vue__.selectedFont = 'uploadedFont';
+            }
+        }).catch(function (error) {
+            console.error('Font loading error:', error);
+        });
+    };
+    reader.readAsArrayBuffer(file);
+}
+
+async function saveFileToOpfs(file) {
+    try {
+        const storageRoot = await navigator.storage.getDirectory();
+        const uploadsDir = await storageRoot.getDirectoryHandle('uploads', { create: true });
+        const newFile = await uploadsDir.getFileHandle(file.name, { create: true });
+        console.log(newFile);
+        const writable = await newFile.createWritable();
+        await writable.write(file);
+        await writable.close();
+    } catch (err) {
+        console.error('Error saving file to OPFS:', err);
+    }
+}
+
+async function loadFontFromOpfs() {
+    try {
+        const storageRoot = await navigator.storage.getDirectory();
+        const uploadsDir = await storageRoot.getDirectoryHandle('uploads');
+        for await (const entry of uploadsDir.values()) {
+            if (entry.kind === 'file') {
+                const file = await entry.getFile();
+                console.log(file);
+                const fileInput = document.getElementById('font-upload-input');
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(new File([file], file.name));
+                fileInput.files = dataTransfer.files;
+                await loadFont(file);
+                break;
+            }
+        }
+    } catch (err) {
+        console.error('Error loading file from OPFS:', err);
+    }
+}

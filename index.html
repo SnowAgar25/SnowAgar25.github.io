@@ -33,19 +33,11 @@
             <div v-for="(component, index) in components" :key="index" class="component-selector">
                 <component-selector :component="component"></component-selector>
             </div>
-            <!-- <div v-for="(component, index) in components" :key="index">
-                <label>{{ component.name }}</label>
-                <span>矩形色塊:</span>
-                <input type="color" v-model="component.color" />
-                <span>字體大小:</span>
-                <input type="number" value="20" v-model="component.fontSize" />
-                <span>Offset X:</span>
-                <input type="number" value="0" v-model="component.offsetX" />
-                <span>Offset Y:</span>
-                <input type="number" value="0" v-model="component.offsetY" />
-            </div> -->
         </div>
-        
+        <div class="font-upload">
+            <label for="font-upload-input">Upload Font File:</label>
+            <input type="file" id="font-upload-input" accept=".ttf, .otf, .woff, .woff2">
+        </div>
         <label>
             <input type="checkbox" v-model="drawContours"> 繪製輪廓
         </label>
@@ -56,16 +48,16 @@
         <div class="image-container">
             <img :src="finalImage" alt="Final Image" width="100%" v-if="finalImage">
         </div>
-        <div id="font-selector-container">
+        <!-- <div id="font-selector-container">
             <input type="text" id="font-search" placeholder="Search fonts...">
             <select id="font-list" size="10"></select>
             <button id="request-font-access" style="display: none;">點擊此處同意讀取本地字體列表</button>
-        </div>
+        </div> -->
     </div>
 
     <script src="app.js"></script>
     <script src="imageProcessor.js"></script>
-    <script src="fontSelector.js"></script>
+    <!-- <script src="fontSelector.js"></script> -->
     <script src="localStorageHandler.js"></script>
 </body>
 </html>
