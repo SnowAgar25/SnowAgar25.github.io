@@ -204,7 +204,13 @@ async function saveFileToOpfs(file) {
         // 刪除舊檔案
         const previousFileName = localStorage.getItem('uploadedFontFileName');
         if (previousFileName) {
-            await uploadsDir.removeEntry(previousFileName, { recursive: false });
+            try {
+                await uploadsDir.removeEntry(previousFileName, { recursive: false });
+            } catch (err) {
+                console.warn(`Error removing old file ${previousFileName}:`, err);
+                // 確保舊檔案名稱被移除
+                localStorage.removeItem('uploadedFontFileName');
+            }
         }
 
         const newFile = await uploadsDir.getFileHandle(file.name, { create: true });
@@ -219,6 +225,7 @@ async function saveFileToOpfs(file) {
     }
 }
 
+
 async function loadFontFromOpfs() {
     try {
         const storageRoot = await navigator.storage.getDirectory();
@@ -226,16 +233,23 @@ async function loadFontFromOpfs() {
         const fileName = localStorage.getItem('uploadedFontFileName');
         
         if (fileName) {
-            const fileHandle = await uploadsDir.getFileHandle(fileName);
-            const file = await fileHandle.getFile();
-            const fileInput = document.getElementById('font-upload-input');
-            const dataTransfer = new DataTransfer();
-            dataTransfer.items.add(new File([file], file.name));
-            fileInput.files = dataTransfer.files;
-            await loadFont(file);
+            try {
+                const fileHandle = await uploadsDir.getFileHandle(fileName);
+                const file = await fileHandle.getFile();
+                const fileInput = document.getElementById('font-upload-input');
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(new File([file], file.name));
+                fileInput.files = dataTransfer.files;
+                await loadFont(file);
+            } catch (err) {
+                console.error('Error loading file from OPFS:', err);
+                // 確保舊檔案名稱被移除
+                localStorage.removeItem('uploadedFontFileName');
+            }
         }
     } catch (err) {
         console.error('Error loading file from OPFS:', err);
     }
 }
+
 
