@@ -111,14 +111,12 @@ var vm = new Vue({
 
                     // 應用正則表達式並更新 "Team" 字段
                     const matches = teamField.match(regexp);
-                    if (matches && matches[0]) {
+                    console.log((matches && matches[1]));
+                    if (matches && matches[1]) {
                         // 使用匹配的結果更新
                         matchScores[i][1] = matches[1];
                     }
                 }
-
-                // 將處理後的數據轉換回 JSON 字符串（如果需要）
-                this.matchScoresJson = JSON.stringify(matchScores);
         
                 this.finalImage = await processImages(
                     this.imageUrl1, 
