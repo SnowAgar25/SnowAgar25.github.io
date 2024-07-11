@@ -46,6 +46,13 @@ textarea {
     margin-bottom: 10px;
 }
 
+.JSON input {
+    width: 100%;
+    height: 4vh;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+}
+
 label {
     display: block;
     margin-bottom: 5px;

@@ -26,8 +26,9 @@
                 <div class="image-container" v-else>{{ imageStatus2 }}</div>
             </div>
         </div>
-        <div>
+        <div class="JSON">
             <label>Match Scores JSON: <textarea id="rowsData" v-model="matchScoresJson"></textarea></label>
+            <label>簡易 Team RegExp: （總是只獲取第一個Group並替換值）<input type="text" v-model="regexpInput" placeholder="Enter your regexp here..."></label>
         </div>
         <div id="components">
             <div v-for="(component, index) in components" :key="index" class="component-selector">

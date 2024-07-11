@@ -34,6 +34,7 @@ var vm = new Vue({
         imageStatus1: 'empty',
         imageStatus2: 'empty',
         matchScoresJson: '',
+        regexpInput: '^\d+\.(.*)$',
         finalImage: '',
         selectedFont: '',
         drawContours: false,
@@ -98,9 +99,27 @@ var vm = new Vue({
                 alert('至少需要一個顏色選擇器有顏色');
                 return;
             }
-
+        
             try {
                 const matchScores = JSON.parse(this.matchScoresJson);
+                const regexp = new RegExp(this.regexpInput);
+        
+                // 遍歷每個數據行（跳過標題行）
+                for (let i = 1; i < matchScores.length; i++) {
+                    // 獲取當前行的 "Team" 字段
+                    const teamField = matchScores[i][1];
+
+                    // 應用正則表達式並更新 "Team" 字段
+                    const matches = teamField.match(regexp);
+                    if (matches && matches[0]) {
+                        // 使用匹配的結果更新
+                        matchScores[i][1] = matches[1];
+                    }
+                }
+
+                // 將處理後的數據轉換回 JSON 字符串（如果需要）
+                this.matchScoresJson = JSON.stringify(matchScores);
+        
                 this.finalImage = await processImages(
                     this.imageUrl1, 
                     this.imageUrl2, 
@@ -138,44 +157,6 @@ var vm = new Vue({
                         });
                 });
         }
-    }
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-    // Load data from localStorage
-    loadLocalStorageData();
-
-    // Add event listener for font upload
-    const fontUploadInput = document.getElementById('font-upload-input');
-    fontUploadInput.addEventListener('change', async (event) => {
-        const file = event.target.files[0];
-        if (file) {
-            await loadFont(file);
-            await saveFileToOpfs(file);
-        }
-    });
-
-    // Check if there is an uploaded font file in OPFS
-    loadFontFromOpfs();
-
-    // Watch Vue instance for changes
-    const app = document.getElementById('app');
-    if (app && app.__vue__) {
-        const vueInstance = app.__vue__;
-        vueInstance.$watch('imageUrl1', function (newValue) {
-            localStorage.setItem('imageUrl1', newValue);
-            vueInstance.updateImage(1);
-        });
-        vueInstance.$watch('imageUrl2', function (newValue) {
-            localStorage.setItem('imageUrl2', newValue);
-            vueInstance.updateImage(2);
-        });
-        vueInstance.$watch('matchScoresJson', function (newValue) {
-            localStorage.setItem('matchScoresJson', newValue);
-        });
-        vueInstance.$watch('components', function (newValue) {
-            localStorage.setItem('components', JSON.stringify(newValue));
-        }, { deep: true });
     }
 });
 
