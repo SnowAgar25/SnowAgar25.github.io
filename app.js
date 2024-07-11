@@ -34,7 +34,7 @@ var vm = new Vue({
         imageStatus1: 'empty',
         imageStatus2: 'empty',
         matchScoresJson: '',
-        regexpInput: '^\d+\.(.*)$',
+        regexpInput: '^\\d+\\.(.*)$',
         finalImage: '',
         selectedFont: '',
         drawContours: false,
